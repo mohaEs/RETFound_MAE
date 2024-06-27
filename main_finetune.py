@@ -15,9 +15,9 @@ import torch
 import torch.backends.cudnn as cudnn
 from torch.utils.tensorboard import SummaryWriter
 
-import timm
+# import timm
+# assert timm.__version__ == "0.3.2" # version check
 
-assert timm.__version__ == "0.3.2" # version check
 from timm.models.layers import trunc_normal_
 from timm.data.mixup import Mixup
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
@@ -103,7 +103,7 @@ def get_args_parser():
                         help='How to apply mixup/cutmix params. Per "batch", "pair", or "elem"')
 
     # * Finetuning params
-    parser.add_argument('--finetune', default='',type=str,
+    parser.add_argument('--finetune', default='/autofs/vast/qtim/datasets/private/mee_parkinsons/models/RETFound_cfp_weights.pth',type=str,
                         help='finetune from checkpoint')
     parser.add_argument('--task', default='',type=str,
                         help='finetune from checkpoint')
@@ -113,7 +113,7 @@ def get_args_parser():
                         help='Use class token instead of global pool for classification')
 
     # Dataset parameters
-    parser.add_argument('--data_path', default='/home/jupyter/Mor_DR_data/data/data/IDRID/Disease_Grading/', type=str,
+    parser.add_argument('--data_path', default='/autofs/vast/qtim/datasets/private/mee_parkinsons/fundus/', type=str,
                         help='dataset path')
     parser.add_argument('--nb_classes', default=1000, type=int,
                         help='number of the classification types')
