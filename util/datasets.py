@@ -8,12 +8,88 @@ from torchvision import datasets, transforms
 from timm.data import create_transform
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
+import pandas as pd
+import PIL
+import logging
+# from PIL import Image
+from torchvision.datasets import VisionDataset
+from tqdm import tqdm
+# from torchvision import transforms
 
-def build_dataset(is_train, args):
-    
+class CSVDataset(VisionDataset):
+    def __init__(self, csv, partition, transform=None, target_transform=None):
+        super(CSVDataset, self).__init__(
+            root=None,
+            transform=transform,
+            target_transform=target_transform
+        )
+
+        df = pd.read_csv(csv, dtype=str)
+
+        if "partition" not in df.keys():
+            df["partition"] = [partition] * df.shape[0]
+
+        partition_df = df[df["partition"] == partition]#.reset_index(drop=True)
+
+        # if not assume_valid:
+        #     valid = []
+        #
+        #     for img in tqdm(partition_df["jpgfile"], desc="Validating file reading"):
+        #         try:
+        #             Image.open(img)
+        #             valid.append(True)
+        #
+        #         except Exception:
+        #             valid.append(False)
+        #
+        #     partition_df["valid"] = valid
+        #
+        #     partition_df = partition_df[partition_df["valid"]]
+
+        self.file_paths = partition_df["jpgfile"]
+
+        if "label" in partition_df.keys():
+            self.labels = partition_df["label"]
+
+        else:
+            self.labels = [1] * len(self.file_paths)
+
+        assert len(self.file_paths) == len(self.labels), "Mismatch between number of files and labels"
+
+    def __len__(self):
+        return len(self.file_paths)
+
+    def __getitem__(self, idx):
+        file_path = self.file_paths[idx]
+        label = self.labels[idx]
+
+        try:
+            img = PIL.Image.open(file_path).convert("RGB")
+
+        except Exception:
+            logging.warning('Image file is truncated: {}'.format(file_path))
+
+            PIL.ImageFile.LOAD_TRUNCATED_IMAGES = True
+            img = PIL.Image.open(file_path).convert("RGB")
+            PIL.ImageFile.LOAD_TRUNCATED_IMAGES = False
+
+
+        # Apply transforms to the image and label (if any)
+        if self.transform:
+            img = self.transform(img)
+        if self.target_transform and label is not None:
+            label = self.target_transform(label)
+
+        return img, label
+
+
+
+def build_dataset(partition, args):
+
+    is_train = partition == "train"
+
     transform = build_transform(is_train, args)
-    root = os.path.join(args.data_path, is_train)
-    dataset = datasets.ImageFolder(root, transform=transform)
+    dataset = CSVDataset(csv=args.csv, partition=partition, transform=transform)
 
     return dataset
 
@@ -46,7 +122,7 @@ def build_transform(is_train, args):
         crop_pct = 1.0
     size = int(args.input_size / crop_pct)
     t.append(
-        transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC), 
+        transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC),
     )
     t.append(transforms.CenterCrop(args.input_size))
     t.append(transforms.ToTensor())

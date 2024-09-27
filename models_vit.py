@@ -12,8 +12,6 @@ from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.models.helpers import load_pretrained
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 from timm.models.resnet import resnet26d, resnet50d
-from timm.models.registry import register_model
-
 
 def _cfg(url='', **kwargs):
     return {
@@ -275,7 +273,7 @@ def _conv_filter(state_dict, patch_size=16):
     return out_dict
 
 
-@register_model
+# @register_model
 def vit_small_patch16_224(pretrained=False, **kwargs):
     if pretrained:
         # NOTE my scale was wrong for original weights, leaving this here until I have better ones for this model
@@ -288,7 +286,7 @@ def vit_small_patch16_224(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_base_patch16_224(pretrained=False, **kwargs):
     model = VisionTransformer(
         patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
@@ -300,7 +298,7 @@ def vit_base_patch16_224(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_base_patch16_384(pretrained=False, **kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
@@ -311,7 +309,7 @@ def vit_base_patch16_384(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_base_patch32_384(pretrained=False, **kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=32, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
@@ -322,7 +320,7 @@ def vit_base_patch32_384(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_large_patch16_224(pretrained=False, **kwargs):
     model = VisionTransformer(
         patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4, qkv_bias=True,
@@ -333,7 +331,7 @@ def vit_large_patch16_224(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_large_patch16_384(pretrained=False, **kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4,  qkv_bias=True,
@@ -344,7 +342,7 @@ def vit_large_patch16_384(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_large_patch32_384(pretrained=False, **kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=32, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4,  qkv_bias=True,
@@ -355,14 +353,14 @@ def vit_large_patch32_384(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_huge_patch16_224(pretrained=False, **kwargs):
     model = VisionTransformer(patch_size=16, embed_dim=1280, depth=32, num_heads=16, mlp_ratio=4, **kwargs)
     model.default_cfg = default_cfgs['vit_huge_patch16_224']
     return model
 
 
-@register_model
+# @register_model
 def vit_huge_patch32_384(pretrained=False, **kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=32, embed_dim=1280, depth=32, num_heads=16, mlp_ratio=4, **kwargs)
@@ -370,7 +368,7 @@ def vit_huge_patch32_384(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_small_resnet26d_224(pretrained=False, **kwargs):
     pretrained_backbone = kwargs.get('pretrained_backbone', True)  # default to True for now, for testing
     backbone = resnet26d(pretrained=pretrained_backbone, features_only=True, out_indices=[4])
@@ -380,7 +378,7 @@ def vit_small_resnet26d_224(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_small_resnet50d_s3_224(pretrained=False, **kwargs):
     pretrained_backbone = kwargs.get('pretrained_backbone', True)  # default to True for now, for testing
     backbone = resnet50d(pretrained=pretrained_backbone, features_only=True, out_indices=[3])
@@ -390,7 +388,7 @@ def vit_small_resnet50d_s3_224(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_base_resnet26d_224(pretrained=False, **kwargs):
     pretrained_backbone = kwargs.get('pretrained_backbone', True)  # default to True for now, for testing
     backbone = resnet26d(pretrained=pretrained_backbone, features_only=True, out_indices=[4])
@@ -400,7 +398,7 @@ def vit_base_resnet26d_224(pretrained=False, **kwargs):
     return model
 
 
-@register_model
+# @register_model
 def vit_base_resnet50d_224(pretrained=False, **kwargs):
     pretrained_backbone = kwargs.get('pretrained_backbone', True)  # default to True for now, for testing
     backbone = resnet50d(pretrained=pretrained_backbone, features_only=True, out_indices=[4])

@@ -326,8 +326,8 @@ def save_model_pretrain(args, epoch, model, model_without_ddp, optimizer, loss_s
     else:
         client_state = {'epoch': epoch}
         model.save_checkpoint(save_dir=args.output_dir, tag="checkpoint-%s" % epoch_name, client_state=client_state)
-        
-        
+
+
 
 def load_model(args, model_without_ddp, optimizer, loss_scaler):
     if args.resume:
@@ -355,4 +355,4 @@ def all_reduce_mean(x):
         return x_reduce.item()
     else:
         return x
-    
+
