@@ -44,6 +44,10 @@ def train_one_epoch(model: torch.nn.Module,
 
         samples = samples.to(device, non_blocking=True)
 
+        if samples.isnan().any():
+            print("Skipping truncated file")
+            continue
+
         with torch.cuda.amp.autocast():
             loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
 

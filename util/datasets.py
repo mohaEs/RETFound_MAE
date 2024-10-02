@@ -3,7 +3,7 @@
 # Partly revised by YZ @UCL&Moorfields
 # --------------------------------------------------------
 
-import os
+import numpy as np
 from torchvision import datasets, transforms
 from timm.data import create_transform
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
@@ -66,6 +66,9 @@ class CSVDataset(VisionDataset):
         try:
             img = PIL.Image.open(file_path).convert("RGB")
 
+            if self.transform:
+                img = self.transform(img)
+
         except Exception:
             logging.warning('Image file is truncated: {}'.format(file_path))
 
@@ -73,10 +76,11 @@ class CSVDataset(VisionDataset):
             img = PIL.Image.open(file_path).convert("RGB")
             PIL.ImageFile.LOAD_TRUNCATED_IMAGES = False
 
+            if self.transform:
+                img = self.transform(img)
 
-        # Apply transforms to the image and label (if any)
-        if self.transform:
-            img = self.transform(img)
+                img[:] = float("NaN")
+
         if self.target_transform and label is not None:
             label = self.target_transform(label)
 

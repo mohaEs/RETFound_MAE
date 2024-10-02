@@ -24,7 +24,7 @@ import numpy as np
 
 
 def misc_measures(confusion_matrix):
-    
+
     acc = []
     sensitivity = []
     specificity = []
@@ -32,7 +32,7 @@ def misc_measures(confusion_matrix):
     G = []
     F1_score_2 = []
     mcc_ = []
-    
+
     for i in range(1, confusion_matrix.shape[0]):
         cm1=confusion_matrix[i]
         acc.append(1.*(cm1[0,0]+cm1[1,1])/np.sum(cm1))
@@ -46,7 +46,7 @@ def misc_measures(confusion_matrix):
         F1_score_2.append(2*precision_*sensitivity_/(precision_+sensitivity_))
         mcc = (cm1[0,0]*cm1[1,1]-cm1[0,1]*cm1[1,0])/np.sqrt((cm1[0,0]+cm1[0,1])*(cm1[0,0]+cm1[1,0])*(cm1[1,1]+cm1[1,0])*(cm1[1,1]+cm1[0,1]))
         mcc_.append(mcc)
-        
+
     acc = np.array(acc).mean()
     sensitivity = np.array(sensitivity).mean()
     specificity = np.array(specificity).mean()
@@ -54,7 +54,7 @@ def misc_measures(confusion_matrix):
     G = np.array(G).mean()
     F1_score_2 = np.array(F1_score_2).mean()
     mcc_ = np.array(mcc_).mean()
-    
+
     return acc, sensitivity, specificity, precision, G, F1_score_2, mcc_
 
 
@@ -84,6 +84,10 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         # we use a per iteration (instead of per epoch) lr scheduler
         if data_iter_step % accum_iter == 0:
             lr_sched.adjust_learning_rate(optimizer, data_iter_step / len(data_loader) + epoch, args)
+
+        if samples.isnan().any():
+            print("Skipping truncated file")
+            continue
 
         samples = samples.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
@@ -142,7 +146,7 @@ def evaluate(data_loader, model, device, task, epoch, mode, num_class):
 
     metric_logger = misc.MetricLogger(delimiter="  ")
     header = 'Test:'
-    
+
     if not os.path.exists(task):
         os.makedirs(task)
 
@@ -150,7 +154,7 @@ def evaluate(data_loader, model, device, task, epoch, mode, num_class):
     prediction_list = []
     true_label_decode_list = []
     true_label_onehot_list = []
-    
+
     # switch to evaluation mode
     model.eval()
 
@@ -184,25 +188,25 @@ def evaluate(data_loader, model, device, task, epoch, mode, num_class):
     prediction_decode_list = np.array(prediction_decode_list)
     confusion_matrix = multilabel_confusion_matrix(true_label_decode_list, prediction_decode_list,labels=[i for i in range(num_class)])
     acc, sensitivity, specificity, precision, G, F1, mcc = misc_measures(confusion_matrix)
-    
+
     auc_roc = roc_auc_score(true_label_onehot_list, prediction_list,multi_class='ovr',average='macro')
-    auc_pr = average_precision_score(true_label_onehot_list, prediction_list,average='macro')          
-            
+    auc_pr = average_precision_score(true_label_onehot_list, prediction_list,average='macro')
+
     metric_logger.synchronize_between_processes()
-    
-    print('Sklearn Metrics - Acc: {:.4f} AUC-roc: {:.4f} AUC-pr: {:.4f} F1-score: {:.4f} MCC: {:.4f}'.format(acc, auc_roc, auc_pr, F1, mcc)) 
+
+    print('Sklearn Metrics - Acc: {:.4f} AUC-roc: {:.4f} AUC-pr: {:.4f} F1-score: {:.4f} MCC: {:.4f}'.format(acc, auc_roc, auc_pr, F1, mcc))
     results_path = task+'_metrics_{}.csv'.format(mode)
     with open(results_path,mode='a',newline='',encoding='utf8') as cfa:
         wf = csv.writer(cfa)
         data2=[[acc,sensitivity,specificity,precision,auc_roc,auc_pr,F1,mcc,metric_logger.loss]]
         for i in data2:
             wf.writerow(i)
-            
-    
+
+
     if mode=='test':
         cm = ConfusionMatrix(actual_vector=true_label_decode_list, predict_vector=prediction_decode_list)
         cm.plot(cmap=plt.cm.Blues,number_label=True,normalized=True,plot_lib="matplotlib")
         plt.savefig(task+'confusion_matrix_test.jpg',dpi=600,bbox_inches ='tight')
-    
+
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()},auc_roc
 
