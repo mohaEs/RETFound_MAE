@@ -1,12 +1,18 @@
-## RETFound - A foundation model for retinal imaging
+# New Adjustments ---
 
+It is forked from https://github.com/mccle/RETFound_MAE
+and contains some adjustments to read imagepath from a CSV file instead of ImageFolder.
+
+
+
+# Original RETFound ReadME: ---
+## RETFound - A foundation model for retinal imaging
 
 Official repo for [RETFound: a foundation model for generalizable disease detection from retinal images](https://www.nature.com/articles/s41586-023-06555-x), which is based on [MAE](https://github.com/facebookresearch/mae):
 
 Please contact 	**ykzhoua@gmail.com** or **yukun.zhou.19@ucl.ac.uk** if you have questions.
 
 Keras version implemented by Yuka Kihara can be found [here](https://github.com/uw-biomedical-ml/RETFound_MAE)
-
 
 ### 📝Key features
 
