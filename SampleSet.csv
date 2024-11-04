@@ -1,0 +1,17 @@
+image_path,dataset,partition,label
+SampledData_ODIR/18_left.jpg,x,train
+SampledData_ODIR/1_left.jpg,x,train
+SampledData_ODIR/1_right.jpg,x,train
+SampledData_ODIR/32_left.jpg,x,train
+SampledData_ODIR/3_left.jpg,x,train
+SampledData_ODIR/3_right.jpg,x,train
+SampledData_ODIR/4_left.jpg,x,train
+SampledData_ODIR/4_right.jpg,x,train
+SampledData_ODIR/5_left.jpg,y,train
+SampledData_ODIR/5_right.jpg,y,train
+SampledData_ODIR/6_left.jpg,y,train
+SampledData_ODIR/6_right.jpg,y,train
+SampledData_ODIR/7_left.jpg,y,train
+SampledData_ODIR/7_right.jpg,y,train
+SampledData_ODIR/8_left.jpg,y,train
+SampledData_ODIR/8_right.jpg,y,train

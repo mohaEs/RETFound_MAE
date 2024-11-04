@@ -46,7 +46,7 @@ class CSVDataset(VisionDataset):
         #
         #     partition_df = partition_df[partition_df["valid"]]
 
-        self.file_paths = partition_df["jpgfile"]
+        self.file_paths = partition_df["image_path"]
 
         if "label" in partition_df.keys():
             self.labels = partition_df["label"]
