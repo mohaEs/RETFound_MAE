@@ -4,7 +4,7 @@ It is forked from https://github.com/mccle/RETFound_MAE
 and contains some adjustments to read imagepath from a CSV file instead of ImageFolder.
 
 main_pretrain accecpts path of a CSV file.
-The CSV file has column headers partition (e.g. train, test, val), jpgfile (path to image files) and label
+The CSV file has column headers partition (e.g. train, test, val), image_path (path to image files) and label
 
 resume training the RETFound on your dataset:
 
