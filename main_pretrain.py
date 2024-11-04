@@ -135,13 +135,16 @@ def main(args):
     cudnn.benchmark = True
 
     # simple augmentation
+    print('------------------------------------')
     transform_train = transforms.Compose([
             transforms.RandomResizedCrop(args.input_size, scale=(0.2, 1.0), interpolation=3),  # 3 is bicubic
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
     dataset_train = CSVDataset(csv=args.csv, partition="train", transform=transform_train)
+    print('DATASET:  ---------------------')
     print(dataset_train)
+    
 
     if True:  # args.distributed:
         num_tasks = misc.get_world_size()
@@ -149,6 +152,7 @@ def main(args):
         sampler_train = torch.utils.data.DistributedSampler(
             dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
         )
+        print('------------------------------------')
         print("Sampler_train = %s" % str(sampler_train))
     else:
         sampler_train = torch.utils.data.RandomSampler(dataset_train)
@@ -156,6 +160,7 @@ def main(args):
     if global_rank == 0 and args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
         log_writer = SummaryWriter(log_dir=args.log_dir)
+        print(' ---- logs will be saved')
     else:
         log_writer = None
 
@@ -167,16 +172,53 @@ def main(args):
         drop_last=True,
     )
 
+
+    def analyze_batch(batch, batch_index):
+        # Assume batch is a tuple (inputs, targets)
+        inputs, targets = batch
+
+        # Check for NaNs
+        has_nan_inputs = torch.isnan(inputs).any().item()
+        has_nan_targets = torch.isnan(targets).any().item()
+
+        # Compute average values
+        avg_inputs = inputs.mean().item()
+        avg_targets = targets.mean().item()
+
+        # Get matrix sizes
+        input_shape = inputs.shape
+        target_shape = targets.shape
+
+        print(f"Batch {batch_index} Analysis:")
+        print(f" - Has NaN in inputs: {has_nan_inputs}")
+        print(f" - Has NaN in targets: {has_nan_targets}")
+        print(f" - Average input value: {avg_inputs:.4f}")
+        print(f" - Average target value: {avg_targets:.4f}")
+        print(f" - Input shape: {input_shape}")
+        print(f" - Target shape: {target_shape}\n")
+
+    # In your training loop
+    
+    for batch_index, batch in enumerate(data_loader_train):
+        analyze_batch(batch, batch_index)
+        break ### lets check only the first batch
+        # Continue with training code
+
+    
+
     # define the model
     model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 
     model.to(device)
 
     model_without_ddp = model
-    print("Model = %s" % str(model_without_ddp))
+    # print("Model = %s" % str(model_without_ddp))
 
     eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
 
+    
+
+    print('------------------------------------')
     if args.lr is None:  # only base_lr is specified
         args.lr = args.blr * eff_batch_size / 256
 
@@ -192,16 +234,26 @@ def main(args):
 
     # following timm: set wd as 0 for bias and norm layers
     param_groups = add_weight_decay(model_without_ddp, args.weight_decay)
-    optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
+    optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))    
+    
     print(optimizer)
     loss_scaler = NativeScaler()
 
+    
     misc.load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
+    
+    
+    print('------------------------------------')
+    print('last trained epoch: ', args.start_epoch)
+    print('resume training for # more epochs: ', args.epochs)
+    print(f"Start training for {args.epochs} epochs")    
+    print('------------------------------------')
 
-    print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in range(args.start_epoch, args.start_epoch+args.epochs):
+        
         if args.distributed:
+            
             data_loader_train.sampler.set_epoch(epoch)
         train_stats = train_one_epoch(
             model, data_loader_train,
@@ -209,7 +261,7 @@ def main(args):
             log_writer=log_writer,
             args=args
         )
-        if args.output_dir and (epoch % 50 == 0 or epoch + 1 == args.epochs):
+        if args.output_dir and (epoch % 50 == 0 or epoch +1 == args.start_epoch+args.epochs):            
             misc.save_model_pretrain(
                 args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
                 loss_scaler=loss_scaler, epoch=epoch)
@@ -218,6 +270,7 @@ def main(args):
                         'epoch': epoch,}
 
         if args.output_dir and misc.is_main_process():
+            
             if log_writer is not None:
                 log_writer.flush()
             with open(os.path.join(args.output_dir, "log.txt"), mode="a", encoding="utf-8") as f:
@@ -226,6 +279,8 @@ def main(args):
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
+
+    
 
 
 if __name__ == '__main__':

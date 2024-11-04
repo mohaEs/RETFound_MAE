@@ -8,29 +8,16 @@ The CSV file has column headers partition (e.g. train, test, val), jpgfile (path
 
 resume training the RETFound on your dataset:
 
-python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_finetune.py \
-    --batch_size 16 \
+python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_pretrain.py \
+    --batch_size 13 \
     --world_size 1 \
-    --model vit_large_patch16 \
-    --resume pretrained_model/RETFound_cfp_weights.pth \
+    --resume "./pretrained_model/RETFound_cfp_weights.pth" \
     --csv SampleSet.csv \
-    --epochs 2 \
-    --blr 5e-3 --layer_decay 0.65 \
-    --weight_decay 0.05 --drop_path 0.2 \
+    --epochs 20 \
+    --blr 5e-3 \
+    --weight_decay 0.05 \
     --input_size 224
 
-or in windows:
-
-python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_finetune.py ^
-    --batch_size 16 ^
-    --world_size 1 ^
-    --model vit_large_patch16 ^
-    --resume pretrained_model/RETFound_cfp_weights.pth ^
-    --csv SampleSet.csv ^
-    --epochs 2 ^
-    --blr 5e-3 --layer_decay 0.65 ^
-    --weight_decay 0.05 --drop_path 0.2 ^
-    --input_size 224
 
 if having only one GPU so no distributed:
 

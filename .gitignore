@@ -1,6 +1,7 @@
 
 
 pretrained_model/
+output_dir/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
