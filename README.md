@@ -7,7 +7,7 @@ main_pretrain accecpts path of a CSV file.
 The CSV file has column headers partition (e.g. train, test, val), image_path (path to image files) and label
 
 resume training the RETFound on your dataset:
-
+```
 python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_pretrain.py \
     --batch_size 13 \
     --world_size 1 \
@@ -17,9 +17,9 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_p
     --blr 5e-3 \
     --weight_decay 0.05 \
     --input_size 224
+```
 
-
-if having only one GPU so no distributed:
+if having only one GPU so no distribution:
 
 
 # Original RETFound ReadME: ---
