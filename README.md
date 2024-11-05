@@ -19,7 +19,9 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_p
     --input_size 224
 ```
 
-if having only one GPU so no distribution:
+for using multiple gpus: e.g. 2: --world_size 2
+
+if having only one GPU on machine (so no distribution):
 
 
 # Original RETFound ReadME: ---
