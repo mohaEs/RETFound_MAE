@@ -2,6 +2,7 @@
 
 pretrained_model/
 output_dir/
+ignoreMEE/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
