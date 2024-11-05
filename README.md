@@ -4,10 +4,10 @@ It is forked from https://github.com/mccle/RETFound_MAE
 and contains some adjustments to read imagepath from a CSV file instead of ImageFolder.
 
 main_pretrain accecpts path of a CSV file.
-The CSV file has column headers partition (e.g. train, test, val), jpgfile (path to image files) and label
+The CSV file has column headers partition (e.g. train, test, val), image_path (path to image files) and label
 
 resume training the RETFound on your dataset:
-
+```
 python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_pretrain.py \
     --batch_size 13 \
     --world_size 1 \
@@ -17,11 +17,9 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_p
     --blr 5e-3 \
     --weight_decay 0.05 \
     --input_size 224
+```
 
-
-to use mutlipe gpus: e.g. --world_size 2
-
-if having only one GPU on system (so no distributed):
+if having only one GPU so no distribution:
 
 
 # Original RETFound ReadME: ---
