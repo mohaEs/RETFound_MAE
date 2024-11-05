@@ -18,8 +18,9 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port=48798 main_p
     --weight_decay 0.05 \
     --input_size 224
 ```
+The batch size of SSL session was 224 for each gpu in the paper.
 
-for using multiple gpus: e.g. 2: --world_size 2
+Hi there, for multiple GPU training please change "n_proc_per_node" and "world_size" to 4 (4 GPUs as an example).
 
 if having only one GPU on machine (so no distribution):
 
